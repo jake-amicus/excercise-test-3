@@ -2,6 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from polls.models import Question
 
+
 class QuestionType(DjangoObjectType):
     class Meta:
         model = Question
@@ -16,13 +17,31 @@ class DeletePoll(graphene.Mutation):
     def mutate(self, info, id):
         return DeletePoll(success=True)
 
+
+class CreatePoll(graphene.Mutation):
+    class Arguments:
+        text = graphene.String(required=True)
+
+    id = graphene.ID()
+    pub_date = graphene.DateTime()
+    question_text = graphene.String()
+
+    def mutate(self, info, text):
+        q = Question.objects.create(question_text=text)
+        # q.save()
+        return CreatePoll(id=q.id, pub_date=q.pub_date, question_text=q.question_text)
+
+
 class Query(graphene.ObjectType):  # pylint: disable=no-init
     questions = graphene.List(QuestionType, n=graphene.Int(required=True))
 
     def resolve_questions(self, info, n=5):
         return Question.objects.all()[:n]
 
+
 class Mutation(graphene.ObjectType):
     delete_poll = DeletePoll.Field()
+    create_poll = CreatePoll.Field()
+
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

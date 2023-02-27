@@ -8,6 +8,11 @@
       "name": "start",
       "command": "python manage.py migrate && python manage.py runserver 0.0.0.0:8000",
       "runAtStart": true
+    },
+    "make_migrations": {
+      "name": "make_migrations",
+      "command": "python manage.py makemigrations",
+      "runAtStart": false
     }
   }
 }
